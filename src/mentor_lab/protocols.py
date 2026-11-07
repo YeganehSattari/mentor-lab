@@ -1,14 +1,17 @@
-"""Minimal typed contracts. m1 task: make these Generic Protocols pass mypy/pyright --strict."""
 from __future__ import annotations
+from typing import Protocol, Sequence, TypeVar
 
-from typing import Protocol, Sequence
+S = TypeVar("S"); A = TypeVar("A")
+S_co = TypeVar("S_co", covariant=True)
+S_contra = TypeVar("S_contra", contravariant=True)
+A_contra = TypeVar("A_contra", contravariant=True)
 
+Context = list[list[float]]
 
-class Env(Protocol):
-    def reset(self, seed: int) -> list[list[float]]: ...
-    def step(self, chosen: Sequence[int]) -> tuple[list[list[float]], float, float, bool]: ...
+class Env(Protocol[S_co, A_contra]):
+    def reset(self, seed: int) -> S_co: ...
+    def step(self, chosen: Sequence[A_contra]) -> tuple[S_co, float, float, bool]: ...
 
-
-class Policy(Protocol):
-    def select(self, contexts: list[list[float]], k: int) -> list[int]: ...
-    def update(self, contexts: list[list[float]], chosen: Sequence[int], rewards: Sequence[float]) -> None: ...
+class Policy(Protocol[S_contra, A]):
+    def select(self, contexts: S_contra, k: int) -> list[A]: ...
+    def update(self, contexts: S_contra, chosen: Sequence[A], rewards: Sequence[float]) -> None: ...

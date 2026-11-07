@@ -36,3 +36,30 @@ def test_seed_independent_of_hashseed():
     out = {subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, cwd=Path(__file__).resolve().parents[1],
                           env={**os.environ, "PYTHONHASHSEED": h}).stdout for h in ("1", "2")}
     assert len(out) == 1 and str(derive_seed(3, "x")) in out.pop()
+
+
+def test_full_eval_bitwise_identical_across_hashseeds():
+    script = Path(__file__).resolve().parents[1] / "scripts" / "repro_check.py"
+    outs = [subprocess.run([sys.executable, str(script)], capture_output=True, text=True, check=True,
+                           env={**os.environ, "PYTHONHASHSEED": h}).stdout for h in ("1", "12345")]
+    assert outs[0] == outs[1] and "linucb" in outs[0]
+
+
+def test_llm_format_failure_rate_is_about_10_percent(caplog):
+    import logging
+    from mentor_lab.schemas import format_failure_rate
+    with caplog.at_level(logging.INFO, logger="mentor_lab.llm"):
+        rate = format_failure_rate(1000)
+    assert 0.07 <= rate <= 0.13
+    assert "format failure rate" in caplog.text
+
+
+def test_strict_model_rejects_bad_outputs():
+    import pytest
+    from pydantic import ValidationError
+    from mentor_lab.schemas import parse_draft
+    bad = '{"intern": "H-01", "strengths": [], "issues": [], "evidence": [], "next_step": "x", "confidence": "high"}'
+    with pytest.raises(ValidationError):
+        parse_draft(bad)
+    with pytest.raises(ValidationError):
+        parse_draft("Sure! Here is the feedback: {}")

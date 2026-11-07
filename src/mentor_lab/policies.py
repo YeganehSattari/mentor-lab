@@ -15,7 +15,7 @@ class RandomPolicy:
     def select(self, contexts: list[list[float]], k: int) -> list[int]:
         return self.r.sample(range(len(contexts)), k)
 
-    def update(self, contexts, chosen, rewards) -> None:  # noqa: D401 - nothing to learn
+    def update(self, contexts: list[list[float]], chosen: Sequence[int], rewards: Sequence[float]) -> None:
         return None
 
 
@@ -28,7 +28,7 @@ class RoundRobin:
         n = len(contexts); out = [(self.ptr + j) % n for j in range(k)]; self.ptr = (self.ptr + k) % n
         return out
 
-    def update(self, contexts, chosen, rewards) -> None:
+    def update(self, contexts: list[list[float]], chosen: Sequence[int], rewards: Sequence[float]) -> None:
         return None
 
 
