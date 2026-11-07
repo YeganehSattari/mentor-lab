@@ -1,0 +1,11 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v3
+      - run: uv sync          # m1: commit uv.lock, then change this to: uv sync --locked
+      - run: uv run pytest -q
+      - run: uv run python scripts/run_baselines.py

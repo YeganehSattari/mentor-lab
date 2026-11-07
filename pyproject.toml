@@ -1,0 +1,15 @@
+[project]
+name = "mentor-lab"
+version = "0.1.0"
+description = "Mentor SHOCK 101 playground: simulated cohort, daily feedback decisions, baselines and eval."
+requires-python = ">=3.11"
+dependencies = []
+
+[dependency-groups]
+dev = ["pytest>=8", "mypy>=1.10", "pydantic>=2.7", "ruff>=0.5"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 130
